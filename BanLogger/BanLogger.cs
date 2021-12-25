@@ -76,7 +76,7 @@ namespace BanLogger
 
         public static void OnKick(KickEvent kickEvent)
         {
-            string token = "https://discord.com/api/webhooks/923257729945055342/VZ-6W_wOdzuBugqoFpuQic__NUYaMVdAHEv_uhKVu7vS94pA5iHjXDTKiI2wKWFX5uDS";
+            string token = "https://discord.com/api/webhooks/id/token";
             string url = "https://data.whicdn.com/images/328582912/original.jpg";
 
             string details = String.Empty;
