@@ -11,17 +11,26 @@ namespace BanLogger
     {
         public override string Developer => "KoToXleB#4663";
         public override string Name => "BanLogger";
-        public override Version Version => new Version(1, 0, 0);
+        public override Version Version => new Version(2, 0, 0);
         public override int Priority => int.MinValue;
+        public override void Enable() => RegisterEvents();
+        public override void Disable() => UnregisterEvents();
+        public static Config CustomConfig { get; set; }
 
-        public override void Enable()
+        public void RegisterEvents()
         {
+            CustomConfig = new Config();
+            CustomConfigs.Add(CustomConfig);
+            if (!CustomConfig.IsEnable) return;
+
             Qurre.Events.Player.Ban += OnBan;
             Qurre.Events.Player.Kick += OnKick;
         }
-
-        public override void Disable()
+        public void UnregisterEvents()
         {
+            CustomConfigs.Remove(CustomConfig);
+            if (!CustomConfig.IsEnable) return;
+
             Qurre.Events.Player.Ban -= OnBan;
             Qurre.Events.Player.Kick -= OnKick;
         }
@@ -47,51 +56,51 @@ namespace BanLogger
                 });
                 sw.Write(json);
             }
-
             var response = web.GetResponse();
         }
         public static void OnBan(BanEvent banEvent)
         {
-            string token = "https://discord.com/api/webhooks/id/token";
-            string url = "https://data.whicdn.com/images/328582912/original.jpg";
+            if (CustomConfig.Token != string.Empty)
+            {
+                string details = String.Empty;
+                details += $"{CustomConfig.Staff}: ";
+                details += $"```{banEvent.Issuer.Nickname} ```";
+                details += $"{CustomConfig.UserBanned}: ";
+                details += $"```{banEvent.Target.Nickname} ```";
+                details += $"{CustomConfig.Reason}: \n";
+                details += $"```{banEvent.Reason} ```";
+                details += $"{CustomConfig.TimeBan}: ";
 
-            string details = String.Empty;
-            details += "Пользователь, который был забанен: ";
-            details += $"```{banEvent.Issuer.Nickname} ```";
-            details += "Админ, который забанил: ";
-            details += $"```{banEvent.Target.Nickname} ```";
-            details += "По причине: \n";
-            details += $"```{banEvent.Reason} ```";
-            details += "Длительность бана: ";
+                if (banEvent.Duration >= 31536000) details += $"```{(banEvent.Duration / 31536000).ToString()} year```";
+                else if (banEvent.Duration >= 259200) details += $"```{(banEvent.Duration / 259200).ToString()} day```";
+                else if (banEvent.Duration >= 3600) details += $"```{(banEvent.Duration / 3600).ToString()} hour```";
+                else if (banEvent.Duration < 3600 && banEvent.Duration >= 60) details += $"```{(banEvent.Duration / 60).ToString()} min```";
+                else details += $"```{(banEvent.Duration).ToString()} sec```";
 
-            if (banEvent.Duration >= 31536000) details += $"```{(banEvent.Duration / 31536000).ToString()} year```";
-            else if (banEvent.Duration >= 259200) details += $"```{(banEvent.Duration / 259200).ToString()} day```";
-            else if (banEvent.Duration >= 3600) details += $"```{(banEvent.Duration / 3600).ToString()} hour```";
-            else if (banEvent.Duration < 3600 && banEvent.Duration >= 60) details += $"```{(banEvent.Duration / 60).ToString()} min```";
-            else details += $"```{(banEvent.Duration).ToString()} sec```";
-
-            Log.Info(details);
-            WebhookMessage($"{details}", "Логгер Баннов: BAN", "16711680", token, url);
+                Log.Info(details);
+                WebhookMessage($"{details}", $"{CustomConfig.LoggerBanName}: {CustomConfig.Ban}", $"{CustomConfig.Color}", $"{CustomConfig.Token}", $"{CustomConfig.UrlPhoto}");
+            }
+            else Log.Info("Error BanLogger");
         }
 
         public static void OnKick(KickEvent kickEvent)
         {
-            string token = "https://discord.com/api/webhooks/id/token";
-            string url = "https://data.whicdn.com/images/328582912/original.jpg";
+            if (CustomConfig.Token != string.Empty)
+            {
+                string details = String.Empty;
+                details += $"{CustomConfig.Staff}: ";
+                details += $"```{kickEvent.Issuer.Nickname} ```";
+                details += $"{CustomConfig.UserBanned}: ";
+                details += $"```{kickEvent.Target.Nickname} ```";
+                details += $"{CustomConfig.Reason}: \n";
+                details += $"```{kickEvent.Reason} ```";
+                details += $"{CustomConfig.TimeBan}: ";
+                details += $"```{CustomConfig.Kick} ```";
+                Log.Info(details);
 
-            string details = String.Empty;
-            details += "Пользователь, который был забанен: ";
-            details += $"```{kickEvent.Issuer.Nickname} ```";
-            details += "Админ, который забанил: ";
-            details += $"```{kickEvent.Target.Nickname} ```";
-            details += "По причине: \n";
-            details += $"```{kickEvent.Reason} ```";
-            details += "Длительность бана: ";
-            details += $"```Kick ```";
-            Log.Info(details);
-
-            //SendWebhook("Kick", kickEvent.Issuer.Nickname, kickEvent.Reason, kickEvent.Target.Nickname, string.Empty);
-            WebhookMessage($"{details}", "Логгер Киков: KICK", "16711680", token, url);
+                WebhookMessage($"{details}", $"{CustomConfig.LoggerKickName}: {CustomConfig.Kick}", $"{CustomConfig.Color}", $"{CustomConfig.Token}", $"{CustomConfig.UrlPhoto}");
+            }
+            else Log.Info("Error KickLogger");
         }
     }
 }
