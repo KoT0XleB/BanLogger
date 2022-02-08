@@ -11,7 +11,7 @@ namespace BanLogger
     {
         public override string Developer => "KoT0XleB#4663";
         public override string Name => "BanLogger";
-        public override Version Version => new Version(2, 1, 0);
+        public override Version Version => new Version(3, 0, 0);
         public override int Priority => int.MinValue;
         public override void Enable() => RegisterEvents();
         public override void Disable() => UnregisterEvents();
@@ -43,14 +43,34 @@ namespace BanLogger
             {
                 string json = JsonConvert.SerializeObject(new
                 {
-                    username = "BanLogger",
+                    username = CustomConfig.UserNameBot,
+                    avatar_url = CustomConfig.AvatarUrlBot,
+                    content = CustomConfig.ContentBot,
                     embeds = new[]
                     {
                         new
                         {
-                            description,
-                            title,
-                            color
+                            description = description,
+                            title = title,
+                            url = string.Empty,
+                            color = color,
+                            image = new 
+                            {
+                                url = CustomConfig.ImageBot
+                            },
+                            author = new
+                            {
+                                name = CustomConfig.AutorName,
+                                icon_url = CustomConfig.AutorIconUrl
+                            },
+                            thumbnail = new
+                            {
+                                url = CustomConfig.ThumbnailUrlBot
+                            },
+                            footer = new
+                            {
+                                text = CustomConfig.FooterTextBot
+                            },
                         }
                     }
                 });
@@ -83,7 +103,7 @@ namespace BanLogger
                     Log.Info($"{banEvent.Issuer.Nickname} banned {banEvent.Target.Nickname} from the server.");
                     WebhookMessage($"{details}", $"{CustomConfig.LoggerBanName}: {CustomConfig.Ban}", $"{CustomConfig.Color}", $"{CustomConfig.Url}");
                 }
-                catch { }
+                catch(Exception ev) { Log.Error(ev); }
             }
             else Log.Info("Error: URL is Empty.");
         }
@@ -107,7 +127,7 @@ namespace BanLogger
                     Log.Info($"{kickEvent.Issuer.Nickname} kicked {kickEvent.Target.Nickname} from the server.");
                     WebhookMessage($"{details}", $"{CustomConfig.LoggerKickName}: {CustomConfig.Kick}", $"{CustomConfig.Color}", $"{CustomConfig.Url}");
                 }
-                catch { }
+                catch (Exception ev) { Log.Error(ev); }
             }
             else Log.Info("Error: URL is Empty.");
         }
