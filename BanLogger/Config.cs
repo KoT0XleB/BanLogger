@@ -29,9 +29,7 @@ namespace BanLogger
         public string Ban { get; set; } = "Бан";
         [Description("Color string")]
         public string Color { get; set; } = "16711680";
-        [Description("Token from the webhook in the discord: https://discord.com/api/webhooks/webhook.id/webhook.token")]
-        public string Token { get; set; } = string.Empty;
-        [Description("URL photos for beauty. Located under the main information of the ban.")]
-        public string UrlPhoto { get; set; } = "NotWorking!!!";
+        [Description("Url from the webhook in the discord: https://discord.com/api/webhooks/webhook.id/webhook.token")]
+        public string Url { get; set; } = string.Empty;
     }
 }

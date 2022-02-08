@@ -9,9 +9,9 @@ namespace BanLogger
 {
     public class BanLogger : Plugin
     {
-        public override string Developer => "KoToXleB#4663";
+        public override string Developer => "KoT0XleB#4663";
         public override string Name => "BanLogger";
-        public override Version Version => new Version(2, 0, 0);
+        public override Version Version => new Version(2, 1, 0);
         public override int Priority => int.MinValue;
         public override void Enable() => RegisterEvents();
         public override void Disable() => UnregisterEvents();
@@ -34,9 +34,9 @@ namespace BanLogger
             Qurre.Events.Player.Ban -= OnBan;
             Qurre.Events.Player.Kick -= OnKick;
         }
-        public static void WebhookMessage(string description, string title, string color, string token, string url)
+        public static void WebhookMessage(string description, string title, string color, string url)
         {
-            WebRequest web = WebRequest.CreateHttp(token);
+            WebRequest web = WebRequest.CreateHttp(url);
             web.ContentType = "application/json";
             web.Method = "POST";
             using (var sw = new StreamWriter(web.GetRequestStream()))
@@ -60,7 +60,7 @@ namespace BanLogger
         }
         public static void OnBan(BanEvent banEvent)
         {
-            if (CustomConfig.Token != string.Empty)
+            if (CustomConfig.Url != string.Empty)
             {
                 string details = String.Empty;
                 details += $"{CustomConfig.Staff}: ";
@@ -71,21 +71,26 @@ namespace BanLogger
                 details += $"```{banEvent.Reason} ```";
                 details += $"{CustomConfig.TimeBan}: ";
 
-                if (banEvent.Duration >= 31536000) details += $"```{(banEvent.Duration / 31536000).ToString()} year```";
-                else if (banEvent.Duration >= 259200) details += $"```{(banEvent.Duration / 259200).ToString()} day```";
-                else if (banEvent.Duration >= 3600) details += $"```{(banEvent.Duration / 3600).ToString()} hour```";
-                else if (banEvent.Duration < 3600 && banEvent.Duration >= 60) details += $"```{(banEvent.Duration / 60).ToString()} min```";
-                else details += $"```{(banEvent.Duration).ToString()} sec```";
+                if (banEvent.Duration >= 31536000) details += $"```{(banEvent.Duration / 31536000)} year```";
+                else if (banEvent.Duration >= 259200) details += $"```{(banEvent.Duration / 259200)} day```";
+                else if (banEvent.Duration >= 3600) details += $"```{(banEvent.Duration / 3600)} hour```";
+                else if (banEvent.Duration < 3600 && banEvent.Duration >= 60) details += $"```{(banEvent.Duration / 60)} min```";
+                else details += $"```{(banEvent.Duration)} sec```";
 
                 Log.Info(details);
-                WebhookMessage($"{details}", $"{CustomConfig.LoggerBanName}: {CustomConfig.Ban}", $"{CustomConfig.Color}", $"{CustomConfig.Token}", $"{CustomConfig.UrlPhoto}");
+                try
+                {
+                    Log.Info($"{banEvent.Issuer.Nickname} banned {banEvent.Target.Nickname} from the server.");
+                    WebhookMessage($"{details}", $"{CustomConfig.LoggerBanName}: {CustomConfig.Ban}", $"{CustomConfig.Color}", $"{CustomConfig.Url}");
+                }
+                catch { }
             }
-            else Log.Info("Error BanLogger");
+            else Log.Info("Error: URL is Empty.");
         }
 
         public static void OnKick(KickEvent kickEvent)
         {
-            if (CustomConfig.Token != string.Empty)
+            if (CustomConfig.Url != string.Empty)
             {
                 string details = String.Empty;
                 details += $"{CustomConfig.Staff}: ";
@@ -96,11 +101,15 @@ namespace BanLogger
                 details += $"```{kickEvent.Reason} ```";
                 details += $"{CustomConfig.TimeBan}: ";
                 details += $"```{CustomConfig.Kick} ```";
-                Log.Info(details);
 
-                WebhookMessage($"{details}", $"{CustomConfig.LoggerKickName}: {CustomConfig.Kick}", $"{CustomConfig.Color}", $"{CustomConfig.Token}", $"{CustomConfig.UrlPhoto}");
+                try
+                {
+                    Log.Info($"{kickEvent.Issuer.Nickname} kicked {kickEvent.Target.Nickname} from the server.");
+                    WebhookMessage($"{details}", $"{CustomConfig.LoggerKickName}: {CustomConfig.Kick}", $"{CustomConfig.Color}", $"{CustomConfig.Url}");
+                }
+                catch { }
             }
-            else Log.Info("Error KickLogger");
+            else Log.Info("Error: URL is Empty.");
         }
     }
 }
