@@ -12,7 +12,7 @@ namespace BanLogger
     {
         public override string Developer => "KoT0XleB#4663";
         public override string Name => "BanLogger";
-        public override Version Version => new Version(3, 0, 0);
+        public override Version Version => new Version(3, 1, 0);
         public override int Priority => 10;
         public override void Enable() => RegisterEvents();
         public override void Disable() => UnregisterEvents();
