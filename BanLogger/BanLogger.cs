@@ -4,6 +4,7 @@ using Qurre.API.Events;
 using System.Net;
 using System.IO;
 using Newtonsoft.Json;
+using System.Threading;
 
 namespace BanLogger
 {
@@ -12,7 +13,7 @@ namespace BanLogger
         public override string Developer => "KoT0XleB#4663";
         public override string Name => "BanLogger";
         public override Version Version => new Version(3, 0, 0);
-        public override int Priority => int.MinValue;
+        public override int Priority => 10;
         public override void Enable() => RegisterEvents();
         public override void Disable() => UnregisterEvents();
         public static Config CustomConfig { get; set; }
@@ -70,7 +71,7 @@ namespace BanLogger
                             footer = new
                             {
                                 text = CustomConfig.FooterTextBot
-                            },
+                            }
                         }
                     }
                 });
@@ -101,9 +102,9 @@ namespace BanLogger
                 try
                 {
                     Log.Info($"{banEvent.Issuer.Nickname} banned {banEvent.Target.Nickname} from the server.");
-                    WebhookMessage($"{details}", $"{CustomConfig.LoggerBanName}: {CustomConfig.Ban}", $"{CustomConfig.Color}", $"{CustomConfig.Url}");
+                    new Thread(() => { WebhookMessage($"{details}", $"{CustomConfig.LoggerBanName}: {CustomConfig.Ban}", $"{CustomConfig.Color}", $"{CustomConfig.Url}"); }).Start();
                 }
-                catch(Exception ev) { Log.Error(ev); }
+                catch(Exception e) { Log.Error(e); }
             }
             else Log.Info("Error: URL is Empty.");
         }
@@ -125,9 +126,9 @@ namespace BanLogger
                 try
                 {
                     Log.Info($"{kickEvent.Issuer.Nickname} kicked {kickEvent.Target.Nickname} from the server.");
-                    WebhookMessage($"{details}", $"{CustomConfig.LoggerKickName}: {CustomConfig.Kick}", $"{CustomConfig.Color}", $"{CustomConfig.Url}");
+                    new Thread(() => { WebhookMessage($"{details}", $"{CustomConfig.LoggerKickName}: {CustomConfig.Kick}", $"{CustomConfig.Color}", $"{CustomConfig.Url}"); }).Start();
                 }
-                catch (Exception ev) { Log.Error(ev); }
+                catch (Exception e) { Log.Error(e); }
             }
             else Log.Info("Error: URL is Empty.");
         }
