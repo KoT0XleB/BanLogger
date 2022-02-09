@@ -98,7 +98,6 @@ namespace BanLogger
                 else if (banEvent.Duration < 3600 && banEvent.Duration >= 60) details += $"```{(banEvent.Duration / 60)} min```";
                 else details += $"```{(banEvent.Duration)} sec```";
 
-                Log.Info(details);
                 try
                 {
                     Log.Info($"{banEvent.Issuer.Nickname} banned {banEvent.Target.Nickname} from the server.");
