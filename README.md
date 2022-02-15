@@ -3,3 +3,4 @@
 ## Webhook
 ### You need to copy the link of your webhook bot and paste it into the configs in the Qurre directory.
 ![](https://github.com/KoT0XleB/BanLogger/blob/main/Discord.png?raw=true)
+### It was inspired by the BanLogger plugin of the Jesus from Exiled
